@@ -1,15 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { updateCharacterStats, saveDailyLog } from '@/lib/character-service';
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 export async function POST(request: NextRequest) {
   try {
-    const { text } = await request.json();
+    const { text, characterId } = await request.json();
 
     if (!text || typeof text !== 'string') {
       return NextResponse.json(
         { error: '유효한 텍스트를 입력해주세요.' },
+        { status: 400 }
+      );
+    }
+
+    if (!characterId || typeof characterId !== 'string') {
+      return NextResponse.json(
+        { error: '캐릭터 ID가 필요합니다.' },
         { status: 400 }
       );
     }
@@ -88,7 +96,31 @@ ${text}`;
       throw new Error('AI 응답 형식이 올바르지 않습니다.');
     }
 
-    return NextResponse.json(parsed);
+    // 캐릭터 스탯 업데이트
+    const updatedCharacter = await updateCharacterStats(
+      characterId,
+      parsed.stats,
+      parsed.xp
+    );
+
+    if (!updatedCharacter) {
+      throw new Error('캐릭터 업데이트에 실패했습니다.');
+    }
+
+    // 플레이 로그 저장
+    await saveDailyLog(
+      characterId,
+      text,
+      parsed.stats,
+      parsed.xp,
+      parsed.comment
+    );
+
+    // 업데이트된 캐릭터 정보와 AI 결과 함께 반환
+    return NextResponse.json({
+      ...parsed,
+      character: updatedCharacter,
+    });
   } catch (error) {
     console.error('Error in analyze API:', error);
     

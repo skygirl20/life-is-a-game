@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { Character } from '@/lib/supabase';
 
 interface GameResult {
   stats: {
@@ -13,6 +14,7 @@ interface GameResult {
   };
   xp: number;
   comment: string;
+  character?: Character;
 }
 
 const StatBar = ({ label, value, icon, color }: { label: string; value: number; icon: string; color: string }) => {
@@ -79,6 +81,11 @@ export default function ResultPage() {
               Life As A Game
             </h1>
           </Link>
+          {result.character && (
+            <div className="text-yellow-300 font-medium mt-2">
+              ⚔️ {result.character.name} · Lv.{result.character.level} · XP {result.character.xp}
+            </div>
+          )}
         </div>
 
         {/* 메인 결과 카드 */}
@@ -92,8 +99,13 @@ export default function ResultPage() {
           {/* 경험치 */}
           <div className="bg-gradient-to-r from-yellow-400/20 to-pink-500/20 rounded-2xl p-6 border border-yellow-400/30">
             <div className="text-center space-y-2">
-              <p className="text-white/80 text-sm font-medium">총 획득 경험치</p>
-              <p className="text-5xl font-bold text-yellow-300">{result.xp} XP</p>
+              <p className="text-white/80 text-sm font-medium">획득 경험치</p>
+              <p className="text-5xl font-bold text-yellow-300">+{result.xp} XP</p>
+              {result.character && (
+                <p className="text-white/60 text-sm">
+                  총 XP: {result.character.xp}
+                </p>
+              )}
             </div>
           </div>
 

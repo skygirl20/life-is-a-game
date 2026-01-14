@@ -1,19 +1,51 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { getCharacterId, getCharacter } from '@/lib/character-service';
+import { Character } from '@/lib/supabase';
 
 export default function InputPage() {
   const [text, setText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [character, setCharacter] = useState<Character | null>(null);
+  const [isLoadingCharacter, setIsLoadingCharacter] = useState(true);
   const router = useRouter();
+
+  useEffect(() => {
+    loadCharacter();
+  }, []);
+
+  const loadCharacter = async () => {
+    const characterId = getCharacterId();
+    
+    if (!characterId) {
+      router.push('/create-character');
+      return;
+    }
+
+    const char = await getCharacter(characterId);
+    
+    if (!char) {
+      router.push('/create-character');
+      return;
+    }
+
+    setCharacter(char);
+    setIsLoadingCharacter(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!text.trim()) {
       alert('오늘의 활동을 입력해주세요!');
+      return;
+    }
+
+    if (!character) {
+      alert('캐릭터 정보를 불러오는 중입니다.');
       return;
     }
 
@@ -25,7 +57,7 @@ export default function InputPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text, characterId: character.id }),
       });
 
       if (!response.ok) {
@@ -44,6 +76,14 @@ export default function InputPage() {
     }
   };
 
+  if (isLoadingCharacter) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center">
+        <div className="text-white text-xl">로딩 중...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
       <div className="max-w-3xl w-full">
@@ -54,6 +94,11 @@ export default function InputPage() {
               Life As A Game
             </h1>
           </Link>
+          {character && (
+            <div className="text-yellow-300 font-medium mb-2">
+              ⚔️ {character.name} · Lv.{character.level} · XP {character.xp}
+            </div>
+          )}
           <p className="text-white/70 text-lg">오늘 하루를 플레이한 기록을 남겨보세요</p>
         </div>
 

@@ -1,6 +1,41 @@
-import Link from 'next/link';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { getCharacterId, getCharacter } from '@/lib/character-service';
 
 export default function Home() {
+  const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    checkCharacter();
+  }, []);
+
+  const checkCharacter = async () => {
+    const characterId = getCharacterId();
+    
+    // 로컬에 캐릭터 ID가 있는지 확인
+    if (!characterId) {
+      setIsChecking(false);
+      return;
+    }
+
+    // 실제로 캐릭터가 존재하는지 확인
+    const character = await getCharacter(characterId);
+    setIsChecking(false);
+  };
+
+  const handleStart = () => {
+    const characterId = getCharacterId();
+    
+    if (characterId) {
+      router.push('/input');
+    } else {
+      router.push('/create-character');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
       <div className="max-w-2xl w-full text-center space-y-8">
@@ -25,12 +60,13 @@ export default function Home() {
 
         {/* CTA 버튼 */}
         <div className="pt-8">
-          <Link
-            href="/input"
-            className="inline-block px-10 py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50"
+          <button
+            onClick={handleStart}
+            disabled={isChecking}
+            className="inline-block px-10 py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            🎮 오늘의 플레이 기록하기
-          </Link>
+            {isChecking ? '로딩 중...' : '🎮 오늘의 플레이 기록하기'}
+          </button>
         </div>
 
         {/* 하단 정보 */}

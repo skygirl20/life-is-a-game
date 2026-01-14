@@ -1,11 +1,34 @@
 # 설정 가이드
 
-## 1. 환경 변수 설정
+## 1. Supabase 프로젝트 설정
+
+### Supabase 프로젝트 생성
+
+1. [Supabase](https://supabase.com) 접속 및 로그인
+2. "New Project" 클릭
+3. 프로젝트 이름, 데이터베이스 비밀번호 설정
+4. 리전 선택 후 "Create new project" 클릭
+
+### 테이블 생성
+
+1. Supabase 대시보드에서 "SQL Editor" 메뉴 선택
+2. "New query" 클릭
+3. 프로젝트 루트의 `supabase-schema.sql` 파일 내용을 복사하여 붙여넣기
+4. "Run" 버튼 클릭하여 실행
+
+### API 키 확인
+
+1. "Settings" → "API" 메뉴로 이동
+2. "Project URL"과 "anon public" 키 복사
+
+## 2. 환경 변수 설정
 
 프로젝트 루트에 `.env.local` 파일을 생성하고 다음 내용을 추가하세요:
 
 ```env
 GOOGLE_API_KEY=your_google_api_key_here
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 ### Google API 키 발급 방법
@@ -19,7 +42,7 @@ GOOGLE_API_KEY=your_google_api_key_here
 
 💡 **Tip**: Gemini는 무료 tier가 매우 관대합니다 (분당 15 requests)
 
-## 2. 로컬 실행
+## 3. 로컬 실행
 
 ```bash
 npm install
@@ -28,7 +51,7 @@ npm run dev
 
 브라우저에서 `http://localhost:3000` 접속
 
-## 3. Vercel 배포
+## 4. Vercel 배포
 
 ### 배포 준비
 1. GitHub에 저장소 생성 및 푸시
@@ -37,14 +60,15 @@ npm run dev
 
 ### 환경 변수 설정
 Vercel 프로젝트 설정에서 다음 환경 변수 추가:
-- Key: `GOOGLE_API_KEY`
-- Value: 발급받은 Google API 키
+- `GOOGLE_API_KEY`: 발급받은 Google API 키
+- `NEXT_PUBLIC_SUPABASE_URL`: Supabase 프로젝트 URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Supabase Anon 키
 
 ### 배포 실행
 - "Deploy" 버튼 클릭
 - 배포 완료 후 URL 확인
 
-## 4. 기능 테스트
+## 5. 기능 테스트
 
 ### 테스트 시나리오 1: 균형잡힌 하루
 ```
