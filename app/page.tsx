@@ -72,34 +72,44 @@ export default function Home() {
 
           {/* CTA 버튼 */}
           <div className="pt-6 space-y-3">
-            <button
-              onClick={handleStart}
-              disabled={isChecking}
-              className="inline-block px-10 py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              {isChecking ? '로딩 중...' : (loggedIn ? '⚔️ 내 캐릭터 보기' : '⚔️ 플레이 시작')}
-            </button>
-
-            {loggedIn && !isChecking && (
-              <button
-                onClick={handleLogout}
-                className="inline-block px-8 py-3 bg-white/5 text-white/70 text-base font-medium rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/10"
-              >
-                🚪 로그아웃
-              </button>
-            )}
-
-            {!loggedIn && !isChecking && (
-              <div className="space-y-2">
-                <p className="text-white/60 text-sm">또는</p>
-                <Link
-                  href="/trial"
-                  className="inline-block px-8 py-3 bg-white/10 text-white text-base font-medium rounded-full hover:bg-white/20 transition-colors border border-white/20"
+            {loggedIn && !isChecking ? (
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={handleStart}
+                  className="px-10 py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50"
                 >
-                  🎮 로그인 없이 체험하기
-                </Link>
-                <p className="text-white/50 text-xs">(체험 모드는 데이터가 저장되지 않습니다)</p>
+                  ⚔️ 내 캐릭터 보기
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="px-8 py-4 bg-white/5 text-white/70 text-lg font-medium rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/10"
+                >
+                  🚪 로그아웃
+                </button>
               </div>
+            ) : (
+              <>
+                <button
+                  onClick={handleStart}
+                  disabled={isChecking}
+                  className="inline-block px-10 py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                >
+                  {isChecking ? '로딩 중...' : '⚔️ 플레이 시작'}
+                </button>
+
+                {!isChecking && (
+                  <div className="space-y-2">
+                    <p className="text-white/60 text-sm">또는</p>
+                    <Link
+                      href="/trial"
+                      className="inline-block px-8 py-3 bg-white/10 text-white text-base font-medium rounded-full hover:bg-white/20 transition-colors border border-white/20"
+                    >
+                      🎮 로그인 없이 체험하기
+                    </Link>
+                    <p className="text-white/50 text-xs">(체험 모드는 데이터가 저장되지 않습니다)</p>
+                  </div>
+                )}
+              </>
             )}
           </div>
 
