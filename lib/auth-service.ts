@@ -28,18 +28,17 @@ export async function signUp(
       return { success: false, error: '모든 항목을 입력해주세요.' };
     }
 
-    if (email.length < 4) {
-      return { success: false, error: '아이디는 4자 이상이어야 합니다.' };
+    // 이메일 형식 검증
+    if (!isEmailFormat(email)) {
+      return { success: false, error: '올바른 이메일 주소를 입력해주세요.' };
     }
 
     if (password.length < 6) {
       return { success: false, error: '비밀번호는 6자 이상이어야 합니다.' };
     }
 
-    // 이메일 형식이면 그대로 사용, 아니면 @life-as-a-game.local 추가
-    const emailForAuth = isEmailFormat(email) 
-      ? email 
-      : `${email}@life-as-a-game.local`;
+    // 이메일 그대로 사용
+    const emailForAuth = email;
 
     // Supabase Auth로 회원가입
     const { data, error } = await supabase.auth.signUp({
@@ -87,13 +86,16 @@ export async function signIn(
   try {
     // 입력 검증
     if (!email || !password) {
-      return { success: false, error: '아이디와 비밀번호를 입력해주세요.' };
+      return { success: false, error: '이메일과 비밀번호를 입력해주세요.' };
     }
 
-    // 이메일 형식이면 그대로 사용, 아니면 @life-as-a-game.local 추가
-    const emailForAuth = isEmailFormat(email) 
-      ? email 
-      : `${email}@life-as-a-game.local`;
+    // 이메일 형식 검증
+    if (!isEmailFormat(email)) {
+      return { success: false, error: '올바른 이메일 주소를 입력해주세요.' };
+    }
+
+    // 이메일 그대로 사용
+    const emailForAuth = email;
 
     // Supabase Auth로 로그인
     const { data, error } = await supabase.auth.signInWithPassword({

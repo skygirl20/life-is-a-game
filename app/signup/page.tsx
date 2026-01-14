@@ -66,16 +66,16 @@ export default function SignUpPage() {
             {/* 아이디 */}
             <div className="space-y-2">
               <label className="block text-white font-medium text-sm">
-                아이디 (이메일 또는 사용자명)
+                이메일 주소
               </label>
               <input
-                type="text"
+                type="email"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                placeholder="이메일 또는 4자 이상 사용자명"
+                placeholder="이메일 주소 (예: user@example.com)"
                 className="w-full px-4 py-3 bg-white/5 border-2 border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-pink-500 transition-colors"
                 disabled={isLoading}
-                autoComplete="username"
+                autoComplete="email"
               />
             </div>
 
