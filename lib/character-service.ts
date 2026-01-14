@@ -23,6 +23,11 @@ export function getCharacterId(): string | null {
 // 캐릭터 생성
 export async function createCharacter(name: string): Promise<Character | null> {
   try {
+    // Supabase 연결 확인
+    if (!supabase) {
+      throw new Error('Supabase 클라이언트가 초기화되지 않았습니다. 환경 변수를 확인하세요.');
+    }
+
     const newCharacter = {
       name,
       level: 1,
@@ -39,7 +44,10 @@ export async function createCharacter(name: string): Promise<Character | null> {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase 에러:', error);
+      throw new Error(`데이터베이스 오류: ${error.message}\n\n테이블이 생성되었는지 확인하세요.`);
+    }
 
     // 생성된 캐릭터 ID 저장
     if (data) {
@@ -49,7 +57,7 @@ export async function createCharacter(name: string): Promise<Character | null> {
     return data;
   } catch (error) {
     console.error('캐릭터 생성 오류:', error);
-    return null;
+    throw error; // 에러를 다시 throw하여 상위에서 처리
   }
 }
 

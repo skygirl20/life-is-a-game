@@ -23,14 +23,17 @@ export default function CreateCharacterPage() {
       const character = await createCharacter(name.trim());
       
       if (!character) {
-        throw new Error('캐릭터 생성에 실패했습니다.');
+        throw new Error('캐릭터 생성에 실패했습니다. Supabase 테이블이 생성되었는지 확인해주세요.');
       }
 
       // 캐릭터 생성 완료 후 입력 페이지로 이동
       router.push('/input');
     } catch (error) {
       console.error('Error:', error);
-      alert('캐릭터 생성 중 오류가 발생했습니다. 다시 시도해주세요.');
+      const errorMessage = error instanceof Error 
+        ? error.message 
+        : '캐릭터 생성 중 오류가 발생했습니다.';
+      alert(`오류: ${errorMessage}\n\n브라우저 콘솔(F12)에서 자세한 오류를 확인하세요.`);
       setIsLoading(false);
     }
   };

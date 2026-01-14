@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getCharacterId, getCharacter } from '@/lib/character-service';
 import { Character } from '@/lib/supabase';
+import TutorialModal from '@/components/TutorialModal';
 
 export default function InputPage() {
   const [text, setText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [character, setCharacter] = useState<Character | null>(null);
   const [isLoadingCharacter, setIsLoadingCharacter] = useState(true);
+  const [showTutorial, setShowTutorial] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -34,6 +36,19 @@ export default function InputPage() {
 
     setCharacter(char);
     setIsLoadingCharacter(false);
+
+    // 튜토리얼 표시 여부 확인
+    checkTutorial();
+  };
+
+  const checkTutorial = () => {
+    // localStorage에서 튜토리얼 완료 여부 확인
+    const tutorialCompleted = localStorage.getItem('tutorialCompleted');
+    
+    // 튜토리얼을 본 적이 없으면 표시
+    if (!tutorialCompleted) {
+      setShowTutorial(true);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,12 +81,22 @@ export default function InputPage() {
 
       const result = await response.json();
       
+      // 에러 응답 확인
+      if (!response.ok || result.error) {
+        const errorMsg = result.details || result.error || '알 수 없는 오류가 발생했습니다.';
+        console.error('API 에러:', result);
+        alert(`오류: ${errorMsg}\n\n브라우저 콘솔(F12)에서 자세한 오류를 확인하세요.`);
+        setIsLoading(false);
+        return;
+      }
+      
       // 결과를 localStorage에 저장하고 결과 페이지로 이동
       localStorage.setItem('gameResult', JSON.stringify(result));
       router.push('/result');
     } catch (error) {
       console.error('Error:', error);
-      alert('분석 중 오류가 발생했습니다. 다시 시도해주세요.');
+      const errorMsg = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      alert(`오류: ${errorMsg}\n\n브라우저 콘솔(F12)에서 자세한 오류를 확인하세요.`);
       setIsLoading(false);
     }
   };
@@ -85,8 +110,12 @@ export default function InputPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
-      <div className="max-w-3xl w-full">
+    <>
+      {/* 튜토리얼 모달 */}
+      {showTutorial && <TutorialModal onClose={() => setShowTutorial(false)} />}
+
+      <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
+        <div className="max-w-3xl w-full">
         {/* 헤더 */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
@@ -113,6 +142,12 @@ export default function InputPage() {
               <p className="text-white/60 text-sm">
                 오늘 무엇을 했나요? 일한 것, 공부한 것, 운동한 것, 쉬운 것... 자유롭게 기록해주세요.
               </p>
+              {/* 입력 힌트 */}
+              <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-xl px-4 py-2 mt-3">
+                <p className="text-yellow-200/80 text-sm">
+                  💡 예시: "공부 2시간, 운동은 못 했고, 프로젝트 조금 진행함"
+                </p>
+              </div>
             </div>
 
             {/* 텍스트 입력 */}
@@ -154,7 +189,8 @@ export default function InputPage() {
         <div className="mt-6 text-center text-white/50 text-sm">
           💡 Tip: 구체적으로 적을수록 더 정확한 스탯을 받을 수 있어요
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

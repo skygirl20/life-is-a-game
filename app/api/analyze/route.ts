@@ -108,13 +108,17 @@ ${text}`;
     }
 
     // 플레이 로그 저장
-    await saveDailyLog(
+    const savedLog = await saveDailyLog(
       characterId,
       text,
       parsed.stats,
       parsed.xp,
       parsed.comment
     );
+
+    if (!savedLog) {
+      console.warn('로그 저장 실패 (캐릭터는 업데이트됨)');
+    }
 
     // 업데이트된 캐릭터 정보와 AI 결과 함께 반환
     return NextResponse.json({
@@ -124,10 +128,30 @@ ${text}`;
   } catch (error) {
     console.error('Error in analyze API:', error);
     
+    // 에러 타입별 상세 메시지
+    let errorMessage = '알 수 없는 오류가 발생했습니다.';
+    let errorDetails = '';
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      
+      // 특정 에러 타입별 처리
+      if (error.message.includes('API key')) {
+        errorDetails = 'Google API 키를 확인해주세요.';
+      } else if (error.message.includes('table') || error.message.includes('schema')) {
+        errorDetails = 'Supabase 테이블이 생성되었는지 확인해주세요.';
+      } else if (error.message.includes('JSON')) {
+        errorDetails = 'AI 응답 형식 오류입니다. 다시 시도해주세요.';
+      } else if (error.message.includes('character')) {
+        errorDetails = '캐릭터 정보를 확인할 수 없습니다.';
+      }
+    }
+    
     return NextResponse.json(
       { 
         error: '분석 중 오류가 발생했습니다.',
-        details: error instanceof Error ? error.message : 'Unknown error'
+        details: errorMessage,
+        hint: errorDetails
       },
       { status: 500 }
     );
