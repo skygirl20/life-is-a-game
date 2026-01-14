@@ -66,7 +66,7 @@ export const LEVEL_MESSAGES: Record<number, { title: string; message: string; is
   },
   2: {
     title: '🎉 레벨 업! Lv.2 도달',
-    message: '이제 하루를 '의식적으로' 플레이하고 있습니다.',
+    message: "이제 하루를 '의식적으로' 플레이하고 있습니다.",
     isSpecial: true,
   },
   3: {
@@ -86,7 +86,7 @@ export const LEVEL_MESSAGES: Record<number, { title: string; message: string; is
   },
   6: {
     title: '🎉 Lv.6 도달',
-    message: '플레이에 '조절'이 들어가기 시작했습니다.',
+    message: "플레이에 '조절'이 들어가기 시작했습니다.",
     isSpecial: false,
   },
   7: {
