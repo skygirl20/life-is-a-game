@@ -13,6 +13,8 @@ export default function TrialPage() {
   const router = useRouter();
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     // 체험 횟수 확인
     const count = parseInt(localStorage.getItem('trialPlayCount') || '0');
     setTrialCount(count);
@@ -135,7 +137,7 @@ export default function TrialPage() {
           <button
             type="submit"
             disabled={isLoading || !text.trim()}
-            className="w-full py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="w-full py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
           >
             {isLoading ? 'AI가 분석하는 중...' : '📊 스탯 계산하기'}
           </button>

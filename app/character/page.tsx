@@ -215,7 +215,7 @@ export default function CharacterPage() {
         <div className="space-y-4">
           <Link
             href="/input"
-            className="block w-full py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50 text-center"
+            className="block w-full py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50 text-center cursor-pointer"
           >
             ▶ 오늘의 플레이 기록하기
           </Link>
@@ -223,13 +223,13 @@ export default function CharacterPage() {
           <div className="flex gap-3">
             <Link
               href="/"
-              className="flex-1 py-3 bg-white/10 backdrop-blur text-white text-base font-medium rounded-full hover:bg-white/20 transition-colors duration-200 border border-white/20 text-center"
+              className="flex-1 py-3 bg-white/10 backdrop-blur text-white text-base font-medium rounded-full hover:bg-white/20 transition-colors duration-200 border border-white/20 text-center cursor-pointer"
             >
               🏠 홈으로
             </Link>
             <button
               onClick={handleLogout}
-              className="flex-1 py-3 bg-white/5 backdrop-blur text-white/80 text-base font-medium rounded-full hover:bg-red-500/20 hover:text-white transition-colors duration-200 border border-white/10"
+              className="flex-1 py-3 bg-white/5 backdrop-blur text-white/80 text-base font-medium rounded-full hover:bg-red-500/20 hover:text-white transition-colors duration-200 border border-white/10 cursor-pointer"
             >
               🚪 로그아웃
             </button>
@@ -261,7 +261,7 @@ export default function CharacterPage() {
                 <button
                   onClick={loadPlayers}
                   disabled={isLoadingPlayers}
-                  className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-lg font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
                 >
                   {isLoadingPlayers ? '로딩 중...' : '👥 다른 플레이어 보기'}
                 </button>
@@ -329,7 +329,7 @@ export default function CharacterPage() {
                   {/* 닫기 버튼 */}
                   <button
                     onClick={() => setShowPlayers(false)}
-                    className="w-full py-2 bg-white/5 text-white/60 text-sm font-medium rounded-full hover:bg-white/10 transition-colors border border-white/10"
+                    className="w-full py-2 bg-white/5 text-white/60 text-sm font-medium rounded-full hover:bg-white/10 transition-colors border border-white/10 cursor-pointer"
                   >
                     닫기
                   </button>

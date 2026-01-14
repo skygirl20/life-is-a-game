@@ -11,7 +11,7 @@ export default function TutorialModal({ onClose, storageKey = 'tutorialCompleted
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
   const handleClose = () => {
-    if (dontShowAgain) {
+    if (dontShowAgain && typeof window !== 'undefined') {
       localStorage.setItem(storageKey, 'true');
     }
     onClose();
@@ -149,7 +149,7 @@ export default function TutorialModal({ onClose, storageKey = 'tutorialCompleted
         <div className="mt-6">
           <button
             onClick={handleClose}
-            className="w-full py-4 bg-slate-700 hover:bg-slate-600 text-slate-200 text-lg font-medium rounded-lg transition-colors duration-200 border border-slate-600/50"
+            className="w-full py-4 bg-slate-700 hover:bg-slate-600 text-slate-200 text-lg font-medium rounded-lg transition-colors duration-200 border border-slate-600/50 cursor-pointer"
           >
             ▶ 첫 플레이 시작하기
           </button>

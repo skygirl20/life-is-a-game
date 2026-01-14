@@ -76,13 +76,13 @@ export default function Home() {
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={handleStart}
-                  className="px-10 py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50"
+                  className="px-10 py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50 cursor-pointer"
                 >
                   ⚔️ 내 캐릭터 보기
                 </button>
                 <button
                   onClick={handleLogout}
-                  className="px-8 py-4 bg-white/5 text-white/70 text-lg font-medium rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/10"
+                  className="px-8 py-4 bg-white/5 text-white/70 text-lg font-medium rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/10 cursor-pointer"
                 >
                   🚪 로그아웃
                 </button>
@@ -92,7 +92,7 @@ export default function Home() {
                 <button
                   onClick={handleStart}
                   disabled={isChecking}
-                  className="inline-block px-10 py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="inline-block px-10 py-4 bg-gradient-to-r from-yellow-400 to-pink-500 text-white text-xl font-bold rounded-full hover:scale-105 transition-transform duration-200 shadow-2xl hover:shadow-pink-500/50 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 cursor-pointer"
                 >
                   {isChecking ? '로딩 중...' : '⚔️ 플레이 시작'}
                 </button>
