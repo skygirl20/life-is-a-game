@@ -48,18 +48,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex flex-col">
-      {/* 로그아웃 버튼 (상단 우측) */}
-      {loggedIn && !isChecking && (
-        <div className="absolute top-4 right-4">
-          <button
-            onClick={handleLogout}
-            className="px-4 py-2 bg-white/5 text-white/60 text-sm font-medium rounded-lg hover:bg-white/10 hover:text-white/80 transition-all border border-white/10"
-          >
-            로그아웃
-          </button>
-        </div>
-      )}
-
       {/* 메인 컨텐츠 */}
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="max-w-2xl w-full text-center space-y-6">
@@ -91,6 +79,15 @@ export default function Home() {
             >
               {isChecking ? '로딩 중...' : (loggedIn ? '⚔️ 내 캐릭터 보기' : '⚔️ 플레이 시작')}
             </button>
+
+            {loggedIn && !isChecking && (
+              <button
+                onClick={handleLogout}
+                className="inline-block px-8 py-3 bg-white/5 text-white/70 text-base font-medium rounded-full hover:bg-white/10 hover:text-white transition-colors border border-white/10"
+              >
+                🚪 로그아웃
+              </button>
+            )}
 
             {!loggedIn && !isChecking && (
               <div className="space-y-2">
