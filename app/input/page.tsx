@@ -151,7 +151,8 @@ export default function InputPage() {
               {/* 입력 힌트 */}
               <div className="bg-yellow-400/10 border border-yellow-400/30 rounded-xl px-4 py-2 mt-3">
                 <p className="text-yellow-200/80 text-sm">
-                  💡 예시: "공부 2시간, 운동은 못 했고, 프로젝트 조금 진행함"
+                  💡 플레이 로그 예시<br />
+                  "공부 2시간, 운동은 못 했고, 프로젝트 조금 진행함"
                 </p>
               </div>
             </div>
