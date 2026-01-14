@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Life As A Game - 현실을 게임처럼",
   description: "현실에서의 하루 행동을 RPG 게임 캐릭터의 성장 시스템으로 변환해주는 AI 서비스",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
