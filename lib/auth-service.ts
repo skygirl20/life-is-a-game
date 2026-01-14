@@ -114,14 +114,16 @@ export async function signIn(
     }
 
     // 캐릭터 조회
-    let character = await supabase
+    const { data: existingCharacter, error: characterError } = await supabase
       .from('characters')
       .select('id, nickname')
       .eq('user_id', data.user.id)
       .single();
 
+    let characterId = existingCharacter?.id;
+
     // 캐릭터가 없으면 자동 생성 (이메일 확인 후 첫 로그인)
-    if (character.error || !character.data) {
+    if (characterError || !existingCharacter) {
       console.log('캐릭터 없음. 자동 생성 중...');
       
       // 사용자 메타데이터에서 닉네임 가져오기
@@ -147,12 +149,12 @@ export async function signIn(
         return { success: false, error: '캐릭터 생성에 실패했습니다. 관리자에게 문의하세요.' };
       }
 
-      character = { data: newCharacter, error: null };
+      characterId = newCharacter?.id;
     }
 
     // 캐릭터 ID를 localStorage에 저장
-    if (character.data && typeof window !== 'undefined') {
-      localStorage.setItem('characterId', character.data.id);
+    if (characterId && typeof window !== 'undefined') {
+      localStorage.setItem('characterId', characterId);
     }
 
     return { success: true, userId: data.user.id };
