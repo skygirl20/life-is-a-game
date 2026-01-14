@@ -32,6 +32,17 @@ export default function SignUpPage() {
       const result = await signUp(userId.trim(), password, nickname.trim());
       
       if (!result.success) {
+        // 이미 가입된 이메일인 경우 로그인 페이지로 안내
+        if (result.error?.includes('이미 사용중인')) {
+          const goToLogin = confirm('이미 가입된 이메일입니다.\n로그인 페이지로 이동하시겠습니까?');
+          if (goToLogin) {
+            router.push('/login');
+          } else {
+            setIsLoading(false);
+          }
+          return;
+        }
+        
         alert(result.error || '회원가입에 실패했습니다.');
         setIsLoading(false);
         return;

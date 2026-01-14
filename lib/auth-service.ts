@@ -53,8 +53,8 @@ export async function signUp(
 
     if (error) {
       console.error('Supabase signUp error:', error);
-      if (error.message.includes('already registered')) {
-        return { success: false, error: '이미 사용중인 아이디입니다.' };
+      if (error.message.includes('already registered') || error.message.includes('User already registered')) {
+        return { success: false, error: '이미 사용중인 이메일입니다.' };
       }
       if (error.message.includes('email')) {
         return { success: false, error: `이메일 오류: ${error.message}` };
