@@ -27,7 +27,7 @@
 - Next.js 15 (App Router) ✅
 - TypeScript ✅
 - Tailwind CSS ✅
-- OpenAI API ✅
+- Google Gemini API ✅
 - Vercel 배포 준비 완료 ✅
 
 ### ✅ 6. AI 프롬프트 설계
@@ -40,7 +40,7 @@
 - README.md 작성 ✅
 - 랜딩 페이지 구현 ✅
 - 입력 페이지 구현 ✅
-- OpenAI API 연동 ✅
+- Google Gemini API 연동 ✅
 - 결과 페이지 구현 ✅
 - Vercel 배포 준비 ✅
 
@@ -51,7 +51,7 @@ life-as-a-game/
 ├── app/
 │   ├── api/
 │   │   └── analyze/
-│   │       └── route.ts          # OpenAI API 연동
+│   │       └── route.ts          # Google Gemini API 연동
 │   ├── input/
 │   │   └── page.tsx              # 입력 페이지
 │   ├── result/
@@ -129,7 +129,7 @@ life-as-a-game/
 ### 필요한 환경 변수
 
 ```env
-OPENAI_API_KEY=your_key_here
+GOOGLE_API_KEY=your_key_here
 ```
 
 ## 📊 예상 사용 시나리오
@@ -180,10 +180,11 @@ OPENAI_API_KEY=your_key_here
 - 반응형 디자인
 - 커스텀 그라데이션
 
-### OpenAI API
-- GPT-4o-mini 모델 사용
-- JSON 모드 응답
+### Google Gemini API
+- gemini-1.5-flash 모델 사용
+- JSON 응답 형식
 - 에러 핸들링
+- 무료 tier 관대 (분당 15 requests)
 
 ## 📈 향후 개선 방향
 

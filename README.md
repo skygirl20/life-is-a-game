@@ -38,7 +38,7 @@ AI가 오늘의 플레이를 요약하는 게임 캐릭터 스타일의 한 줄 
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **AI**: OpenAI API (GPT-4)
+- **AI**: Google Gemini (gemini-1.5-flash)
 - **Deployment**: Vercel
 
 ## 🚀 실행 방법
@@ -55,7 +55,7 @@ npm install
 2. 환경 변수 설정
 ```bash
 # .env.local 파일 생성
-OPENAI_API_KEY=your_openai_api_key
+GOOGLE_API_KEY=your_google_api_key
 ```
 
 3. 개발 서버 실행
@@ -71,7 +71,7 @@ Vercel을 사용한 배포:
 
 1. Vercel 계정 연결
 2. 프로젝트 import
-3. 환경 변수 `OPENAI_API_KEY` 설정
+3. 환경 변수 `GOOGLE_API_KEY` 설정
 4. Deploy
 
 ## 💡 향후 개선 아이디어

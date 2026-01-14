@@ -5,17 +5,19 @@
 프로젝트 루트에 `.env.local` 파일을 생성하고 다음 내용을 추가하세요:
 
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
+GOOGLE_API_KEY=your_google_api_key_here
 ```
 
-### OpenAI API 키 발급 방법
+### Google API 키 발급 방법
 
-1. [OpenAI Platform](https://platform.openai.com/api-keys) 접속
-2. 로그인 또는 회원가입
-3. API Keys 메뉴에서 새 키 생성
+1. [Google AI Studio](https://aistudio.google.com/app/apikey) 접속
+2. Google 계정으로 로그인
+3. "Get API key" 또는 "Create API key" 버튼 클릭
 4. 생성된 키를 복사하여 `.env.local` 파일에 붙여넣기
 
 ⚠️ **주의**: API 키는 절대 공개 저장소에 커밋하지 마세요!
+
+💡 **Tip**: Gemini는 무료 tier가 매우 관대합니다 (분당 15 requests)
 
 ## 2. 로컬 실행
 
@@ -35,8 +37,8 @@ npm run dev
 
 ### 환경 변수 설정
 Vercel 프로젝트 설정에서 다음 환경 변수 추가:
-- Key: `OPENAI_API_KEY`
-- Value: 발급받은 OpenAI API 키
+- Key: `GOOGLE_API_KEY`
+- Value: 발급받은 Google API 키
 
 ### 배포 실행
 - "Deploy" 버튼 클릭
@@ -90,15 +92,15 @@ Vercel 프로젝트 설정에서 다음 환경 변수 추가:
 
 ## 문제 해결
 
-### "OpenAI API 키가 설정되지 않았습니다" 오류
+### "Google API 키가 설정되지 않았습니다" 오류
 - `.env.local` 파일이 프로젝트 루트에 있는지 확인
 - 파일 이름이 정확한지 확인 (`.env.local`, `.env`가 아님)
 - 개발 서버 재시작 (`Ctrl+C` 후 `npm run dev`)
 
 ### "분석 중 오류가 발생했습니다" 오류
-- OpenAI API 키가 유효한지 확인
+- Google API 키가 유효한지 확인
 - 인터넷 연결 확인
-- OpenAI 계정에 크레딧이 있는지 확인
+- API 사용량 제한을 확인 (무료 tier: 분당 15 requests)
 
 ### 스타일이 적용되지 않음
 - `npm run dev` 재시작

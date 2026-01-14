@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || '');
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,9 +14,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!process.env.OPENAI_API_KEY) {
+    if (!process.env.GOOGLE_API_KEY) {
       return NextResponse.json(
-        { error: 'OpenAI API 키가 설정되지 않았습니다.' },
+        { error: 'Google API 키가 설정되지 않았습니다.' },
         { status: 500 }
       );
     }
@@ -54,27 +52,28 @@ export async function POST(request: NextRequest) {
   },
   "xp": number,
   "comment": "string"
-}`;
+}
 
-    const userPrompt = `오늘의 활동:\n${text}`;
+오늘의 활동:
+${text}`;
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-      temperature: 0.7,
-      response_format: { type: 'json_object' },
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-1.5-flash',
+      generationConfig: {
+        temperature: 0.7,
+        responseMimeType: 'application/json',
+      },
     });
 
-    const result = completion.choices[0].message.content;
-    
-    if (!result) {
+    const result = await model.generateContent(systemPrompt);
+    const response = result.response;
+    const responseText = response.text();
+
+    if (!responseText) {
       throw new Error('AI 응답이 비어있습니다.');
     }
 
-    const parsed = JSON.parse(result);
+    const parsed = JSON.parse(responseText);
 
     // 응답 검증
     if (
