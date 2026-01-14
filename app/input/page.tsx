@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { getCharacterId, getCharacter } from '@/lib/character-service';
 import { Character } from '@/lib/supabase';
 import TutorialModal from '@/components/TutorialModal';
+import { getXPForCurrentLevel, getRequiredXP } from '@/lib/level-system';
 
 export default function InputPage() {
   const [text, setText] = useState('');
@@ -124,8 +125,13 @@ export default function InputPage() {
             </h1>
           </Link>
           {character && (
-            <div className="text-yellow-300 font-medium mb-2">
-              ⚔️ {character.name} · Lv.{character.level} · XP {character.xp}
+            <div className="space-y-1">
+              <div className="text-yellow-300 font-medium">
+                ⚔️ {character.name} · Lv.{character.level}
+              </div>
+              <div className="text-white/60 text-sm">
+                XP: {getXPForCurrentLevel(character.xp, character.level)} / {getRequiredXP(character.level)}
+              </div>
             </div>
           )}
           <p className="text-white/70 text-lg">오늘 하루를 플레이한 기록을 남겨보세요</p>

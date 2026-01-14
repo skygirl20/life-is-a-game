@@ -1,9 +1,5 @@
 import { supabase, Character, DailyLog } from './supabase';
-
-// 레벨 계산 공식: level = floor(total_xp / 500) + 1
-export function calculateLevel(xp: number): number {
-  return Math.floor(xp / 500) + 1;
-}
+import { calculateLevel, checkLevelUp } from './level-system';
 
 // 캐릭터 ID를 로컬 스토리지에 저장
 export function saveCharacterId(id: string): void {
@@ -79,7 +75,7 @@ export async function getCharacter(id: string): Promise<Character | null> {
   }
 }
 
-// 캐릭터 스탯 업데이트
+// 캐릭터 스탯 업데이트 (레벨업 정보 포함)
 export async function updateCharacterStats(
   id: string,
   statDeltas: {
@@ -89,7 +85,7 @@ export async function updateCharacterStats(
     growth: number;
   },
   xpGained: number
-): Promise<Character | null> {
+): Promise<{ character: Character; levelUp: { leveled: boolean; oldLevel: number; newLevel: number } } | null> {
   try {
     // 현재 캐릭터 정보 가져오기
     const character = await getCharacter(id);
@@ -102,6 +98,9 @@ export async function updateCharacterStats(
     const newGrowth = character.growth + statDeltas.growth;
     const newXp = character.xp + xpGained;
     const newLevel = calculateLevel(newXp);
+
+    // 레벨업 여부 확인
+    const levelUpInfo = checkLevelUp(character.xp, newXp);
 
     // 캐릭터 업데이트
     const { data, error } = await supabase
@@ -120,7 +119,10 @@ export async function updateCharacterStats(
 
     if (error) throw error;
 
-    return data;
+    return {
+      character: data,
+      levelUp: levelUpInfo,
+    };
   } catch (error) {
     console.error('캐릭터 업데이트 오류:', error);
     return null;

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Character } from '@/lib/supabase';
+import { getLevelMessage, getXPForCurrentLevel, getRequiredXP } from '@/lib/level-system';
 
 interface GameResult {
   stats: {
@@ -15,6 +16,11 @@ interface GameResult {
   xp: number;
   comment: string;
   character?: Character;
+  levelUp?: {
+    leveled: boolean;
+    oldLevel: number;
+    newLevel: number;
+  };
 }
 
 const StatBar = ({ label, value, icon, color }: { label: string; value: number; icon: string; color: string }) => {
@@ -96,15 +102,48 @@ export default function ResultPage() {
             <div className="h-1 w-24 mx-auto bg-gradient-to-r from-yellow-400 to-pink-500 rounded-full"></div>
           </div>
 
+          {/* 레벨업 메시지 */}
+          {result.levelUp?.leveled && (
+            <div className={`rounded-2xl p-6 border-2 ${
+              getLevelMessage(result.levelUp.newLevel).isSpecial
+                ? 'bg-gradient-to-r from-yellow-400/30 to-pink-500/30 border-yellow-400 shadow-2xl shadow-yellow-400/50'
+                : 'bg-white/10 border-white/30'
+            }`}>
+              <div className="text-center space-y-2">
+                <h3 className="text-2xl font-bold text-white">
+                  {getLevelMessage(result.levelUp.newLevel).title}
+                </h3>
+                <p className="text-white/90 text-lg leading-relaxed">
+                  {getLevelMessage(result.levelUp.newLevel).message}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* 경험치 */}
           <div className="bg-gradient-to-r from-yellow-400/20 to-pink-500/20 rounded-2xl p-6 border border-yellow-400/30">
             <div className="text-center space-y-2">
               <p className="text-white/80 text-sm font-medium">획득 경험치</p>
               <p className="text-5xl font-bold text-yellow-300">+{result.xp} XP</p>
               {result.character && (
-                <p className="text-white/60 text-sm">
-                  총 XP: {result.character.xp}
-                </p>
+                <>
+                  <p className="text-white/60 text-sm">
+                    총 XP: {result.character.xp}
+                  </p>
+                  <div className="mt-4 pt-4 border-t border-white/20">
+                    <p className="text-white/70 text-sm">
+                      다음 레벨까지: {getRequiredXP(result.character.level) - getXPForCurrentLevel(result.character.xp, result.character.level)} XP
+                    </p>
+                    <div className="mt-2 h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-gradient-to-r from-yellow-400 to-pink-500 transition-all duration-1000"
+                        style={{
+                          width: `${(getXPForCurrentLevel(result.character.xp, result.character.level) / getRequiredXP(result.character.level)) * 100}%`
+                        }}
+                      />
+                    </div>
+                  </div>
+                </>
               )}
             </div>
           </div>

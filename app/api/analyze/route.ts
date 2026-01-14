@@ -97,15 +97,17 @@ ${text}`;
     }
 
     // 캐릭터 스탯 업데이트
-    const updatedCharacter = await updateCharacterStats(
+    const updateResult = await updateCharacterStats(
       characterId,
       parsed.stats,
       parsed.xp
     );
 
-    if (!updatedCharacter) {
+    if (!updateResult) {
       throw new Error('캐릭터 업데이트에 실패했습니다.');
     }
+
+    const { character: updatedCharacter, levelUp } = updateResult;
 
     // 플레이 로그 저장
     const savedLog = await saveDailyLog(
@@ -124,6 +126,7 @@ ${text}`;
     return NextResponse.json({
       ...parsed,
       character: updatedCharacter,
+      levelUp,
     });
   } catch (error) {
     console.error('Error in analyze API:', error);
