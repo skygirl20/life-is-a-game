@@ -1,5 +1,21 @@
 import { supabase, Character, DailyLog } from './supabase';
+import { supabaseServer } from './supabase-server';
 import { calculateLevel, checkLevelUp } from './level-system';
+
+// 환경에 따라 적절한 Supabase 클라이언트 반환
+function getSupabaseClient() {
+  // #region agent log
+  const isServer = typeof window === 'undefined';
+  fetch('http://127.0.0.1:7242/ingest/1c8f892f-924f-4efd-9cbd-58f06c6471cc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'lib/character-service.ts:8',message:'getSupabaseClient called',data:{isServer,clientType:isServer?'supabaseServer':'supabase'},timestamp:Date.now(),sessionId:'debug-session',hypothesisId:'D'})}).catch(()=>{});
+  // #endregion
+  
+  // 서버 환경 (API 라우트)에서는 Service Role Key 사용
+  if (typeof window === 'undefined') {
+    return supabaseServer;
+  }
+  // 클라이언트 환경 (브라우저)에서는 일반 클라이언트 사용
+  return supabase;
+}
 
 // 캐릭터 ID를 로컬 스토리지에 저장
 export function saveCharacterId(id: string): void {
@@ -19,10 +35,7 @@ export function getCharacterId(): string | null {
 // 캐릭터 생성
 export async function createCharacter(name: string): Promise<Character | null> {
   try {
-    // Supabase 연결 확인
-    if (!supabase) {
-      throw new Error('Supabase 클라이언트가 초기화되지 않았습니다. 환경 변수를 확인하세요.');
-    }
+    const client = getSupabaseClient();
 
     const newCharacter = {
       name,
@@ -34,7 +47,7 @@ export async function createCharacter(name: string): Promise<Character | null> {
       growth: 0,
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('characters')
       .insert([newCharacter])
       .select()
@@ -60,7 +73,9 @@ export async function createCharacter(name: string): Promise<Character | null> {
 // 캐릭터 조회
 export async function getCharacter(id: string): Promise<Character | null> {
   try {
-    const { data, error } = await supabase
+    const client = getSupabaseClient();
+    
+    const { data, error } = await client
       .from('characters')
       .select('*')
       .eq('id', id)
@@ -103,7 +118,9 @@ export async function updateCharacterStats(
     const levelUpInfo = checkLevelUp(character.xp, newXp);
 
     // 캐릭터 업데이트
-    const { data, error } = await supabase
+    const client = getSupabaseClient();
+    
+    const { data, error } = await client
       .from('characters')
       .update({
         focus: newFocus,
@@ -143,6 +160,7 @@ export async function saveDailyLog(
   aiComment: string
 ): Promise<DailyLog | null> {
   try {
+    const client = getSupabaseClient();
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
     const newLog = {
@@ -157,7 +175,7 @@ export async function saveDailyLog(
       ai_comment: aiComment,
     };
 
-    const { data, error } = await supabase
+    const { data, error } = await client
       .from('daily_logs')
       .insert([newLog])
       .select()

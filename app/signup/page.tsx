@@ -37,8 +37,8 @@ export default function SignUpPage() {
         return;
       }
 
-      // 회원가입 성공 - 캐릭터 페이지로 이동
-      router.push('/character');
+      // 회원가입 성공 - 이메일 확인 페이지로 이동
+      router.push(`/verify-email?email=${encodeURIComponent(userId.trim())}`);
     } catch (error) {
       console.error('Error:', error);
       alert('회원가입 중 오류가 발생했습니다.');
@@ -66,13 +66,13 @@ export default function SignUpPage() {
             {/* 아이디 */}
             <div className="space-y-2">
               <label className="block text-white font-medium text-sm">
-                아이디
+                아이디 (이메일 또는 사용자명)
               </label>
               <input
                 type="text"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                placeholder="4자 이상"
+                placeholder="이메일 또는 4자 이상 사용자명"
                 className="w-full px-4 py-3 bg-white/5 border-2 border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-pink-500 transition-colors"
                 disabled={isLoading}
                 autoComplete="username"

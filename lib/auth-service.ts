@@ -11,6 +11,11 @@ export interface AuthUser {
   };
 }
 
+// 이메일 형식인지 확인하는 헬퍼 함수
+function isEmailFormat(input: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input);
+}
+
 // 회원가입
 export async function signUp(
   email: string,
@@ -31,9 +36,14 @@ export async function signUp(
       return { success: false, error: '비밀번호는 6자 이상이어야 합니다.' };
     }
 
+    // 이메일 형식이면 그대로 사용, 아니면 @life-as-a-game.local 추가
+    const emailForAuth = isEmailFormat(email) 
+      ? email 
+      : `${email}@life-as-a-game.local`;
+
     // Supabase Auth로 회원가입
     const { data, error } = await supabase.auth.signUp({
-      email: `${email}@life-as-a-game.local`, // 이메일 형식으로 변환
+      email: emailForAuth,
       password,
       options: {
         data: {
@@ -43,8 +53,12 @@ export async function signUp(
     });
 
     if (error) {
+      console.error('Supabase signUp error:', error);
       if (error.message.includes('already registered')) {
         return { success: false, error: '이미 사용중인 아이디입니다.' };
+      }
+      if (error.message.includes('email')) {
+        return { success: false, error: `이메일 오류: ${error.message}` };
       }
       throw error;
     }
@@ -53,30 +67,8 @@ export async function signUp(
       throw new Error('사용자 생성 실패');
     }
 
-    // 캐릭터 생성 (Lv.1부터 시작)
-    const { data: newCharacter, error: characterError } = await supabase
-      .from('characters')
-      .insert([{
-        user_id: data.user.id, // auth.users.id 참조
-        nickname,
-        level: 1,
-        xp: 0,
-        focus: 0,
-        health: 0,
-        mental: 0,
-        growth: 0,
-      }])
-      .select()
-      .single();
-
-    if (characterError) throw characterError;
-    if (!newCharacter) throw new Error('캐릭터 생성 실패');
-
-    // 캐릭터 ID를 localStorage에 저장
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('characterId', newCharacter.id);
-    }
-
+    // 이메일 확인이 필요한 경우, 캐릭터는 확인 후 첫 로그인 시 생성됨
+    // 회원가입은 성공으로 처리하고 이메일 확인 페이지로 이동
     return { success: true, userId: data.user.id };
   } catch (error) {
     console.error('회원가입 오류:', error);
@@ -98,13 +90,22 @@ export async function signIn(
       return { success: false, error: '아이디와 비밀번호를 입력해주세요.' };
     }
 
+    // 이메일 형식이면 그대로 사용, 아니면 @life-as-a-game.local 추가
+    const emailForAuth = isEmailFormat(email) 
+      ? email 
+      : `${email}@life-as-a-game.local`;
+
     // Supabase Auth로 로그인
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: `${email}@life-as-a-game.local`,
+      email: emailForAuth,
       password,
     });
 
     if (error) {
+      console.error('Supabase signIn error:', error);
+      if (error.message.includes('Email not confirmed')) {
+        return { success: false, error: '이메일 확인이 필요합니다. 받은편지함을 확인해주세요.' };
+      }
       return { success: false, error: '아이디 또는 비밀번호가 일치하지 않습니다.' };
     }
 
@@ -113,19 +114,45 @@ export async function signIn(
     }
 
     // 캐릭터 조회
-    const { data: character, error: characterError } = await supabase
+    let character = await supabase
       .from('characters')
-      .select('id')
+      .select('id, nickname')
       .eq('user_id', data.user.id)
       .single();
 
-    if (characterError || !character) {
-      return { success: false, error: '캐릭터를 찾을 수 없습니다.' };
+    // 캐릭터가 없으면 자동 생성 (이메일 확인 후 첫 로그인)
+    if (character.error || !character.data) {
+      console.log('캐릭터 없음. 자동 생성 중...');
+      
+      // 사용자 메타데이터에서 닉네임 가져오기
+      const nickname = data.user.user_metadata?.nickname || '플레이어';
+      
+      const { data: newCharacter, error: createError } = await supabase
+        .from('characters')
+        .insert([{
+          user_id: data.user.id,
+          nickname,
+          level: 1,
+          xp: 0,
+          focus: 0,
+          health: 0,
+          mental: 0,
+          growth: 0,
+        }])
+        .select()
+        .single();
+
+      if (createError) {
+        console.error('캐릭터 생성 오류:', createError);
+        return { success: false, error: '캐릭터 생성에 실패했습니다. 관리자에게 문의하세요.' };
+      }
+
+      character = { data: newCharacter, error: null };
     }
 
     // 캐릭터 ID를 localStorage에 저장
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('characterId', character.id);
+    if (character.data && typeof window !== 'undefined') {
+      localStorage.setItem('characterId', character.data.id);
     }
 
     return { success: true, userId: data.user.id };

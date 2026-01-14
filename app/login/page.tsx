@@ -59,13 +59,13 @@ export default function LoginPage() {
             {/* 아이디 */}
             <div className="space-y-2">
               <label className="block text-white font-medium text-sm">
-                아이디
+                아이디 (이메일 또는 사용자명)
               </label>
               <input
                 type="text"
                 value={userId}
                 onChange={(e) => setUserId(e.target.value)}
-                placeholder="아이디 입력"
+                placeholder="이메일 또는 사용자명 입력"
                 className="w-full px-4 py-3 bg-white/5 border-2 border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-pink-500 transition-colors"
                 disabled={isLoading}
                 autoComplete="username"
