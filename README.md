@@ -73,8 +73,8 @@ AI가 입력된 하루를 분석하여 4가지 RPG 스탯으로 변환합니다:
 
 1. 저장소 클론 및 의존성 설치
 ```bash
-git clone https://github.com/yourusername/life-as-a-game.git
-cd life-as-a-game
+git clone https://github.com/skygirl20/life-is-a-game.git
+cd life-is-a-game
 npm install
 ```
 
@@ -88,9 +88,10 @@ npm install
 3. 환경 변수 설정
 ```bash
 # .env.local 파일 생성
-GOOGLE_API_KEY=your_google_api_key
+NEXT_PUBLIC_GEMINI_API_KEY=your_google_gemini_api_key
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
 
 4. 개발 서버 실행
@@ -106,7 +107,11 @@ Vercel을 사용한 배포:
 
 1. Vercel 계정 연결
 2. 프로젝트 import
-3. 환경 변수 `GOOGLE_API_KEY` 설정
+3. 환경 변수 설정:
+   - `NEXT_PUBLIC_GEMINI_API_KEY`
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_ROLE_KEY`
 4. Deploy
 
 ## 🔒 보안
