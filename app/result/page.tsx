@@ -54,31 +54,31 @@ export default function ResultPage() {
   const router = useRouter();
 
   useEffect(() => {
+    const checkAuthAndLoadResult = async () => {
+      // 로그인 확인
+      const user = await getCurrentUser();
+      if (!user) {
+        router.push('/login');
+        return;
+      }
+
+      const savedResult = localStorage.getItem('gameResult');
+      
+      if (!savedResult) {
+        router.push('/input');
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(savedResult);
+        setResult(parsed);
+      } catch (error) {
+        console.error('Failed to parse result:', error);
+        router.push('/input');
+      }
+    };
+
     checkAuthAndLoadResult();
-  }, [router]);
-
-  const checkAuthAndLoadResult = async () => {
-    // 로그인 확인
-    const user = await getCurrentUser();
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-
-    const savedResult = localStorage.getItem('gameResult');
-    
-    if (!savedResult) {
-      router.push('/input');
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(savedResult);
-      setResult(parsed);
-    } catch (error) {
-      console.error('Failed to parse result:', error);
-      router.push('/input');
-    }
   }, [router]);
 
   if (!result) {

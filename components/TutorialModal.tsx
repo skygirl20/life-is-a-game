@@ -4,14 +4,15 @@ import { useState } from 'react';
 
 interface TutorialModalProps {
   onClose: () => void;
+  storageKey?: string; // localStorage 키 (기본값: 'tutorialCompleted')
 }
 
-export default function TutorialModal({ onClose }: TutorialModalProps) {
+export default function TutorialModal({ onClose, storageKey = 'tutorialCompleted' }: TutorialModalProps) {
   const [dontShowAgain, setDontShowAgain] = useState(false);
 
   const handleClose = () => {
     if (dontShowAgain) {
-      localStorage.setItem('tutorialCompleted', 'true');
+      localStorage.setItem(storageKey, 'true');
     }
     onClose();
   };

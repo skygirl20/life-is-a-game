@@ -3,18 +3,30 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import TutorialModal from '@/components/TutorialModal';
 
 export default function TrialPage() {
   const [text, setText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [trialCount, setTrialCount] = useState(0);
+  const [showTutorial, setShowTutorial] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     // 체험 횟수 확인
     const count = parseInt(localStorage.getItem('trialPlayCount') || '0');
     setTrialCount(count);
+
+    // 튜토리얼 표시 확인 (체험 모드 전용)
+    const tutorialCompleted = localStorage.getItem('trialTutorialCompleted');
+    if (!tutorialCompleted) {
+      setShowTutorial(true);
+    }
   }, []);
+
+  const handleCloseTutorial = () => {
+    setShowTutorial(false);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,6 +71,9 @@ export default function TrialPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center p-4">
+      {/* 튜토리얼 모달 */}
+      {showTutorial && <TutorialModal onClose={handleCloseTutorial} storageKey="trialTutorialCompleted" />}
+      
       <div className="max-w-3xl w-full">
         {/* 헤더 */}
         <div className="text-center mb-8">
