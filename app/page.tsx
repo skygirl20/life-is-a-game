@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getCurrentUser } from '@/lib/auth-service';
+import { getCurrentUser, signOut } from '@/lib/auth-service';
 import Link from 'next/link';
 
 export default function Home() {
@@ -15,21 +15,51 @@ export default function Home() {
   }, []);
 
   const checkAuth = async () => {
-    const user = await getCurrentUser();
-    setLoggedIn(!!user);
-    setIsChecking(false);
+    try {
+      const user = await getCurrentUser();
+      // 명확하게 로그인 여부 확인
+      console.log('로그인 상태 확인:', user ? '로그인됨' : '비로그인');
+      setLoggedIn(!!user);
+    } catch (error) {
+      console.error('인증 확인 오류:', error);
+      // 에러 발생 시 비로그인 상태로 처리
+      setLoggedIn(false);
+    } finally {
+      setIsChecking(false);
+    }
   };
 
   const handleStart = () => {
     if (loggedIn) {
       router.push('/character');
     } else {
-      router.push('/signup');
+      router.push('/login');
+    }
+  };
+
+  const handleLogout = async () => {
+    if (confirm('로그아웃 하시겠습니까?')) {
+      await signOut();
+      setLoggedIn(false);
+      // 페이지 새로고침하여 상태 초기화
+      router.refresh();
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex flex-col">
+      {/* 로그아웃 버튼 (상단 우측) */}
+      {loggedIn && !isChecking && (
+        <div className="absolute top-4 right-4">
+          <button
+            onClick={handleLogout}
+            className="px-4 py-2 bg-white/5 text-white/60 text-sm font-medium rounded-lg hover:bg-white/10 hover:text-white/80 transition-all border border-white/10"
+          >
+            로그아웃
+          </button>
+        </div>
+      )}
+
       {/* 메인 컨텐츠 */}
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="max-w-2xl w-full text-center space-y-6">

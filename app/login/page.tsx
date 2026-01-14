@@ -101,9 +101,9 @@ export default function LoginPage() {
           {/* 회원가입 링크 */}
           <div className="mt-6 text-center">
             <p className="text-white/60 text-sm">
-              처음 방문하셨나요?{' '}
-              <Link href="/signup" className="text-yellow-300 hover:text-yellow-200 font-medium">
-                캐릭터 생성
+              아이디가 없으신가요?{' '}
+              <Link href="/signup" className="text-yellow-300 hover:text-yellow-200 font-medium underline">
+                회원가입
               </Link>
             </p>
           </div>
