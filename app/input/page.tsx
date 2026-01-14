@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getCharacterId, getCharacter } from '@/lib/character-service';
+import { isLoggedIn } from '@/lib/auth-service';
 import { Character } from '@/lib/supabase';
 import TutorialModal from '@/components/TutorialModal';
 import { getXPForCurrentLevel, getRequiredXP } from '@/lib/level-system';
@@ -21,17 +22,23 @@ export default function InputPage() {
   }, []);
 
   const loadCharacter = async () => {
+    // 로그인 확인
+    if (!isLoggedIn()) {
+      router.push('/login');
+      return;
+    }
+
     const characterId = getCharacterId();
     
     if (!characterId) {
-      router.push('/create-character');
+      router.push('/signup');
       return;
     }
 
     const char = await getCharacter(characterId);
     
     if (!char) {
-      router.push('/create-character');
+      router.push('/signup');
       return;
     }
 
