@@ -40,17 +40,57 @@ export default function CharacterPage() {
       return;
     }
 
-    const characterId = getCharacterId();
+    let characterId = getCharacterId();
     
+    // 캐릭터가 없으면 자동 생성 (이메일 확인 후 첫 로그인)
     if (!characterId) {
-      router.push('/signup');
+      console.log('캐릭터 없음. 자동 생성 중...');
+      
+      // 사용자 메타데이터에서 닉네임 가져오기
+      const nickname = user.user_metadata?.nickname || '플레이어';
+      
+      const { supabase } = await import('@/lib/supabase');
+      const { data: newCharacter, error: createError } = await supabase
+        .from('characters')
+        .insert([{
+          user_id: user.id,
+          nickname,
+          level: 1,
+          xp: 0,
+          focus: 0,
+          health: 0,
+          mental: 0,
+          growth: 0,
+        }])
+        .select()
+        .single();
+
+      if (createError || !newCharacter) {
+        console.error('캐릭터 생성 오류:', createError);
+        alert('캐릭터 생성에 실패했습니다. 다시 시도해주세요.');
+        router.push('/');
+        return;
+      }
+
+      characterId = newCharacter.id;
+      
+      // localStorage에 저장
+      if (characterId && typeof window !== 'undefined') {
+        localStorage.setItem('characterId', characterId);
+      }
+    }
+
+    if (!characterId) {
+      alert('캐릭터 ID를 찾을 수 없습니다.');
+      router.push('/');
       return;
     }
 
     const char = await getCharacter(characterId);
     
     if (!char) {
-      router.push('/signup');
+      alert('캐릭터를 불러올 수 없습니다.');
+      router.push('/');
       return;
     }
 
