@@ -1,71 +1,29 @@
-// 인증 서비스
-// MVP용 간단한 아이디/비밀번호 인증
+// Supabase Auth 기반 인증 서비스
+// 보안이 검증된 Supabase의 내장 인증 시스템 사용
 
 import { supabase } from './supabase';
 
-export interface User {
+export interface AuthUser {
   id: string;
-  user_id: string;
-  created_at: string;
-}
-
-// 비밀번호 해싱 (브라우저용 간단한 해싱)
-// 주의: 이것은 MVP용이며, 프로덕션에서는 백엔드에서 bcrypt 등을 사용해야 합니다
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
-}
-
-// 로그인 정보를 로컬스토리지에 저장
-export function saveAuth(userId: string): void {
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('userId', userId);
-    localStorage.setItem('isLoggedIn', 'true');
-  }
-}
-
-// 로그인 정보 가져오기
-export function getAuth(): { userId: string | null; isLoggedIn: boolean } {
-  if (typeof window !== 'undefined') {
-    return {
-      userId: localStorage.getItem('userId'),
-      isLoggedIn: localStorage.getItem('isLoggedIn') === 'true',
-    };
-  }
-  return { userId: null, isLoggedIn: false };
-}
-
-// 로그아웃
-export function clearAuth(): void {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('userId');
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('characterId'); // 캐릭터 ID도 제거
-  }
-}
-
-// 로그인 여부 확인
-export function isLoggedIn(): boolean {
-  return getAuth().isLoggedIn;
+  email?: string;
+  user_metadata?: {
+    nickname?: string;
+  };
 }
 
 // 회원가입
 export async function signUp(
-  userId: string,
+  email: string,
   password: string,
   nickname: string
 ): Promise<{ success: boolean; userId?: string; error?: string }> {
   try {
     // 입력 검증
-    if (!userId || !password || !nickname) {
+    if (!email || !password || !nickname) {
       return { success: false, error: '모든 항목을 입력해주세요.' };
     }
 
-    if (userId.length < 4) {
+    if (email.length < 4) {
       return { success: false, error: '아이디는 4자 이상이어야 합니다.' };
     }
 
@@ -73,35 +31,33 @@ export async function signUp(
       return { success: false, error: '비밀번호는 6자 이상이어야 합니다.' };
     }
 
-    // 기존 사용자 확인
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('user_id', userId)
-      .single();
+    // Supabase Auth로 회원가입
+    const { data, error } = await supabase.auth.signUp({
+      email: `${email}@life-as-a-game.local`, // 이메일 형식으로 변환
+      password,
+      options: {
+        data: {
+          nickname, // 사용자 메타데이터에 닉네임 저장
+        },
+      },
+    });
 
-    if (existingUser) {
-      return { success: false, error: '이미 사용중인 아이디입니다.' };
+    if (error) {
+      if (error.message.includes('already registered')) {
+        return { success: false, error: '이미 사용중인 아이디입니다.' };
+      }
+      throw error;
     }
 
-    // 비밀번호 해싱
-    const passwordHash = await hashPassword(password);
-
-    // 사용자 생성
-    const { data: newUser, error: userError } = await supabase
-      .from('users')
-      .insert([{ user_id: userId, password_hash: passwordHash }])
-      .select()
-      .single();
-
-    if (userError) throw userError;
-    if (!newUser) throw new Error('사용자 생성 실패');
+    if (!data.user) {
+      throw new Error('사용자 생성 실패');
+    }
 
     // 캐릭터 생성 (Lv.1부터 시작)
     const { data: newCharacter, error: characterError } = await supabase
       .from('characters')
       .insert([{
-        user_id: newUser.id,
+        user_id: data.user.id, // auth.users.id 참조
         nickname,
         level: 1,
         xp: 0,
@@ -116,15 +72,12 @@ export async function signUp(
     if (characterError) throw characterError;
     if (!newCharacter) throw new Error('캐릭터 생성 실패');
 
-    // 로그인 정보 저장
-    saveAuth(newUser.id);
-    
-    // 캐릭터 ID도 저장
+    // 캐릭터 ID를 localStorage에 저장
     if (typeof window !== 'undefined') {
       localStorage.setItem('characterId', newCharacter.id);
     }
 
-    return { success: true, userId: newUser.id };
+    return { success: true, userId: data.user.id };
   } catch (error) {
     console.error('회원가입 오류:', error);
     return {
@@ -136,50 +89,46 @@ export async function signUp(
 
 // 로그인
 export async function signIn(
-  userId: string,
+  email: string,
   password: string
 ): Promise<{ success: boolean; userId?: string; error?: string }> {
   try {
     // 입력 검증
-    if (!userId || !password) {
+    if (!email || !password) {
       return { success: false, error: '아이디와 비밀번호를 입력해주세요.' };
     }
 
-    // 비밀번호 해싱
-    const passwordHash = await hashPassword(password);
+    // Supabase Auth로 로그인
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: `${email}@life-as-a-game.local`,
+      password,
+    });
 
-    // 사용자 조회
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('id, user_id, password_hash')
-      .eq('user_id', userId)
-      .eq('password_hash', passwordHash)
-      .single();
-
-    if (error || !user) {
+    if (error) {
       return { success: false, error: '아이디 또는 비밀번호가 일치하지 않습니다.' };
     }
 
+    if (!data.user) {
+      return { success: false, error: '로그인에 실패했습니다.' };
+    }
+
     // 캐릭터 조회
-    const { data: character } = await supabase
+    const { data: character, error: characterError } = await supabase
       .from('characters')
       .select('id')
-      .eq('user_id', user.id)
+      .eq('user_id', data.user.id)
       .single();
 
-    if (!character) {
+    if (characterError || !character) {
       return { success: false, error: '캐릭터를 찾을 수 없습니다.' };
     }
 
-    // 로그인 정보 저장
-    saveAuth(user.id);
-    
-    // 캐릭터 ID도 저장
+    // 캐릭터 ID를 localStorage에 저장
     if (typeof window !== 'undefined') {
       localStorage.setItem('characterId', character.id);
     }
 
-    return { success: true, userId: user.id };
+    return { success: true, userId: data.user.id };
   } catch (error) {
     console.error('로그인 오류:', error);
     return {
@@ -189,22 +138,77 @@ export async function signIn(
   }
 }
 
-// 사용자 정보 가져오기
-export async function getCurrentUser(): Promise<User | null> {
+// 로그아웃
+export async function signOut(): Promise<void> {
   try {
-    const { userId } = getAuth();
-    if (!userId) return null;
+    await supabase.auth.signOut();
+    
+    // localStorage 정리
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('characterId');
+      localStorage.removeItem('tutorialCompleted');
+    }
+  } catch (error) {
+    console.error('로그아웃 오류:', error);
+  }
+}
 
-    const { data, error } = await supabase
-      .from('users')
-      .select('id, user_id, created_at')
-      .eq('id', userId)
-      .single();
+// 현재 로그인된 사용자 확인
+export async function getCurrentUser(): Promise<AuthUser | null> {
+  try {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    
+    if (error || !user) {
+      return null;
+    }
 
-    if (error) throw error;
-    return data;
+    return {
+      id: user.id,
+      email: user.email,
+      user_metadata: user.user_metadata,
+    };
   } catch (error) {
     console.error('사용자 정보 조회 오류:', error);
     return null;
   }
+}
+
+// 로그인 여부 확인 (간단한 세션 체크)
+export async function isLoggedIn(): Promise<boolean> {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    return !!session;
+  } catch (error) {
+    return false;
+  }
+}
+
+// 로그인 여부 확인 (동기)
+export function isLoggedInSync(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  // localStorage에 characterId가 있으면 로그인된 것으로 간주
+  // 실제 검증은 각 페이지에서 getCurrentUser()로 수행
+  return !!localStorage.getItem('characterId');
+}
+
+// 캐릭터 ID 가져오기
+export function getCharacterId(): string | null {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('characterId');
+}
+
+// auth 상태 변화 감지 (리스너)
+export function onAuthStateChange(callback: (user: AuthUser | null) => void) {
+  return supabase.auth.onAuthStateChange((event, session) => {
+    if (session?.user) {
+      callback({
+        id: session.user.id,
+        email: session.user.email,
+        user_metadata: session.user.user_metadata,
+      });
+    } else {
+      callback(null);
+    }
+  });
 }

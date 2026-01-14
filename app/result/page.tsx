@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { isLoggedIn } from '@/lib/auth-service';
+import { getCurrentUser } from '@/lib/auth-service';
 import { Character } from '@/lib/supabase';
 import { getLevelMessage, getXPForCurrentLevel, getRequiredXP } from '@/lib/level-system';
 
@@ -54,8 +54,13 @@ export default function ResultPage() {
   const router = useRouter();
 
   useEffect(() => {
+    checkAuthAndLoadResult();
+  }, [router]);
+
+  const checkAuthAndLoadResult = async () => {
     // 로그인 확인
-    if (!isLoggedIn()) {
+    const user = await getCurrentUser();
+    if (!user) {
       router.push('/login');
       return;
     }

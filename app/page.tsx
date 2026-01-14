@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { isLoggedIn } from '@/lib/auth-service';
+import { getCurrentUser } from '@/lib/auth-service';
 import Link from 'next/link';
 
 export default function Home() {
@@ -15,8 +15,8 @@ export default function Home() {
   }, []);
 
   const checkAuth = async () => {
-    const logged = isLoggedIn();
-    setLoggedIn(logged);
+    const user = await getCurrentUser();
+    setLoggedIn(!!user);
     setIsChecking(false);
   };
 

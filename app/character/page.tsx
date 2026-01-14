@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getCharacterId, getCharacter } from '@/lib/character-service';
-import { isLoggedIn, clearAuth } from '@/lib/auth-service';
+import { getCurrentUser, signOut } from '@/lib/auth-service';
 import { Character } from '@/lib/supabase';
 import { getXPForCurrentLevel, getRequiredXP } from '@/lib/level-system';
 
@@ -19,7 +19,8 @@ export default function CharacterPage() {
 
   const loadCharacter = async () => {
     // 로그인 확인
-    if (!isLoggedIn()) {
+    const user = await getCurrentUser();
+    if (!user) {
       router.push('/login');
       return;
     }
@@ -42,9 +43,9 @@ export default function CharacterPage() {
     setIsLoading(false);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (confirm('로그아웃 하시겠습니까?')) {
-      clearAuth();
+      await signOut();
       router.push('/');
     }
   };

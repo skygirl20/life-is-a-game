@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getCharacterId, getCharacter } from '@/lib/character-service';
-import { isLoggedIn } from '@/lib/auth-service';
+import { getCurrentUser } from '@/lib/auth-service';
 import { Character } from '@/lib/supabase';
 import TutorialModal from '@/components/TutorialModal';
 import { getXPForCurrentLevel, getRequiredXP } from '@/lib/level-system';
@@ -23,7 +23,8 @@ export default function InputPage() {
 
   const loadCharacter = async () => {
     // 로그인 확인
-    if (!isLoggedIn()) {
+    const user = await getCurrentUser();
+    if (!user) {
       router.push('/login');
       return;
     }

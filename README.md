@@ -18,7 +18,10 @@ Life As A Game은 당신의 일상을 게임으로 바라봅니다. 오늘 하�
 - 체험 모드에서는 데이터가 저장되지 않습니다
 
 ### 2. 회원가입 및 로그인
-- 간단한 아이디/비밀번호 기반 인증
+- **Supabase Auth** 기반 안전한 인증
+  - bcrypt 자동 비밀번호 해싱
+  - JWT 토큰 기반 세션 관리
+  - Rate limiting 내장
 - 회원가입 시 자동으로 Lv.1 캐릭터 생성
 - 모든 플레이 데이터가 안전하게 저장됩니다
 
@@ -59,8 +62,9 @@ AI가 입력된 하루를 분석하여 4가지 RPG 스탯으로 변환합니다:
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
-- **AI**: Google Gemini (gemini-1.5-flash)
+- **AI**: Google Gemini (gemini-2.0-flash-exp)
 - **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth (bcrypt, JWT)
 - **Deployment**: Vercel
 
 ## 🚀 실행 방법
@@ -74,9 +78,12 @@ cd life-as-a-game
 npm install
 ```
 
-2. Supabase 프로젝트 생성 및 테이블 설정
+2. Supabase 프로젝트 생성 및 설정
 - [Supabase](https://supabase.com)에서 프로젝트 생성
-- SQL Editor에서 `supabase-schema-v2.sql` 실행 (users, characters, daily_logs 테이블 생성)
+- **Authentication > Providers > Email** 활성화
+- **Authentication > Settings**:
+  - "Enable email confirmations" **비활성화** (MVP용)
+- SQL Editor에서 `supabase-schema-v3.sql` 실행 (characters, daily_logs 테이블 생성)
 
 3. 환경 변수 설정
 ```bash
@@ -102,6 +109,21 @@ Vercel을 사용한 배포:
 3. 환경 변수 `GOOGLE_API_KEY` 설정
 4. Deploy
 
+## 🔒 보안
+
+이 프로젝트는 **Supabase Auth**를 사용하여 엔터프라이즈급 보안을 제공합니다:
+
+- ✅ **bcrypt 비밀번호 해싱** - Rainbow table 공격 방어
+- ✅ **JWT 토큰** - 세션 관리 및 인증
+- ✅ **Row Level Security (RLS)** - 사용자별 데이터 격리
+- ✅ **HTTPS 암호화** - Vercel 자동 지원
+- ✅ **Rate Limiting** - 무차별 대입 공격 방어
+
+추가 보안 권장사항:
+- 프로덕션에서는 이메일 인증 활성화
+- 환경 변수를 절대 공개하지 않기
+- 정기적인 Supabase 보안 업데이트 확인
+
 ## 💡 향후 개선 아이디어
 
 - 일간/주간/월간 통계 대시보드
@@ -109,9 +131,10 @@ Vercel을 사용한 배포:
 - 스킬 트리 및 업적 시스템
 - 친구와 스탯 비교 기능
 - 캐릭터 커스터마이징
-- OAuth 소셜 로그인 (Google, GitHub 등)
+- OAuth 소셜 로그인 (Google, GitHub 등) - Supabase Auth로 간단히 추가 가능
 - 플레이 스트릭 (연속 플레이 일수)
 - 스탯 그래프 시각화
+- 이메일 인증 추가
 
 ## 📝 라이선스
 
